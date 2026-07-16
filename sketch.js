@@ -324,17 +324,23 @@ function keyPressed() {
 }
 
 // ============================================================
-// DRAW DEBUG PANEL - very beaut pink
+// DRAW DEBUG PANEL - Beautiful Pink Edition (Right Corner)
 // ============================================================
 function drawDebugPanel() {
   push();
+
+  // Set the position to the top-right corner with a 15px margin
+  let panelWidth = 270;
+  let panelHeight = 235;
+  let x = width - panelWidth - 15; // 800 - 270 - 15 = 515px
+  let y = 15;
 
   // Semi-transparent deep-plum/pink background overlay
   fill(30, 20, 28, 240);
   stroke(255, 105, 180); // Vibrant Hot Pink Border
   strokeWeight(2);
   rectMode(CORNER);
-  rect(15, 15, 270, 235, 8);
+  rect(x, y, panelWidth, panelHeight, 8);
 
   // Panel Title
   noStroke();
@@ -342,39 +348,39 @@ function drawDebugPanel() {
   textSize(13);
   textStyle(BOLD);
   textAlign(LEFT, TOP);
-  text("🌸 SYSTEM DEBUG ACTIVE", 25, 25);
+  text("🌸 SYSTEM DEBUG ACTIVE", x + 10, y + 10);
 
   // Soft pink-tinted dividing line
   stroke(80, 40, 60);
   strokeWeight(1);
-  line(20, 45, 280, 45);
+  line(x + 5, y + 30, x + panelWidth - 5, y + 30);
   noStroke();
 
   // Diagnostics Info
   fill(240, 220, 230); // Soft lavender-pink text
   textSize(11);
   textStyle(NORMAL);
-  text(`State: ${gameState.toUpperCase()}`, 25, 55);
-  text(`Current Level: ${currentLevel}`, 25, 70);
-  text(`Score: ${score} / ${targetScore}`, 25, 85);
-  text(`Lives: ${lives}`, 25, 100);
+  text(`State: ${gameState.toUpperCase()}`, x + 10, y + 40);
+  text(`Current Level: ${currentLevel}`, x + 10, y + 55);
+  text(`Score: ${score} / ${targetScore}`, x + 10, y + 70);
+  text(`Lives: ${lives}`, x + 10, y + 85);
 
-  // Soft pink-tinted dividing linee
+  // Soft pink-tinted dividing line
   stroke(80, 40, 60);
   strokeWeight(1);
-  line(20, 115, 280, 115);
+  line(x + 5, y + 100, x + panelWidth - 5, y + 100);
   noStroke();
 
   // Keyboard binds directory
   fill(255, 182, 193); // Light Pastel Pink
-  text("DEBUG CONTROL BINDS:", 25, 125);
+  text("DEBUG CONTROL BINDS:", x + 10, y + 110);
 
   fill(190, 170, 180);
-  text("[D] Toggle This Panel", 25, 145);
-  text("[1, 2, 3] Jump directly to Level", 25, 160);
-  text("[S] Force Start Screen", 25, 175);
-  text("[W] Force Win Screen", 25, 190);
-  text("[O] Force Game Over Screen", 25, 205);
+  text("[D] Toggle This Panel", x + 10, y + 130);
+  text("[1, 2, 3] Jump directly to Level", x + 10, y + 145);
+  text("[S] Force Start Screen", x + 10, y + 160);
+  text("[W] Force Win Screen", x + 10, y + 175);
+  text("[O] Force Game Over Screen", x + 10, y + 190);
 
   pop();
 }
