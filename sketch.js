@@ -8,13 +8,10 @@ const STATE_OVER = "over";
 
 let gameState = STATE_START;
 
-// Level Data & JSON Configs
+// Level Data & Progression
 let currentLevel = 1;
-let levelData = null; // Will store the active JSON config
-
-// Game Progression Stats
 let score = 0;
-let targetScore = 5; // Default (will be overwritten by JSON level data if present)
+let targetScore = 3; // Default level 1 target
 let lives = 3;
 
 // Card Game Parameters
@@ -29,18 +26,10 @@ let feedbackColor = [255, 255, 255];
 let showDebug = false; // Toggled via key 'D'
 
 // ============================================================
-// preload() - Loads the JSON configurations
+// preload()
 // ============================================================
 function preload() {
-  // Try loading your local JSON configurations.
-  // If they don't have custom parameters, we fall back to defaults.
-  try {
-    loadLevelData(currentLevel);
-  } catch (e) {
-    console.log(
-      "Could not preload level JSON. Falling back to code-based generation.",
-    );
-  }
+  // Empty to prevent any missing asset loading crashes!
 }
 
 // ============================================================
@@ -68,7 +57,7 @@ function draw() {
     drawGameOverScreen();
   }
 
-  // Draw the debug panel on top if enabled
+  // Draw the debug panel on top of everything if enabled
   if (showDebug) {
     drawDebugPanel();
   }
@@ -89,13 +78,9 @@ function drawStartScreen() {
   textStyle(NORMAL);
   fill(180);
   text(`Select Level 1, 2, or 3 to begin testing!`, width / 2, height / 2 - 20);
-  text(
-    `JSON Levels will automatically determine targets and limits.`,
-    width / 2,
-    height / 2 + 10,
-  );
+  text(`Press 'D' to open the Debug Overlay.`, width / 2, height / 2 + 10);
 
-  // Interactive Button
+  // Interactive Play Button
   fill(76, 175, 80);
   rectMode(CENTER);
   rect(width / 2, height / 2 + 80, 200, 50, 8);
@@ -110,9 +95,16 @@ function drawPlayScreen() {
   textAlign(LEFT, TOP);
   fill(255);
   textSize(16);
+  textStyle(BOLD);
   text(`LEVEL: ${currentLevel}`, 30, 30);
   text(`SCORE: ${score} / ${targetScore}`, 30, 55);
-  text(`LIVES: ${"❤️ ".repeat(max(0, lives))}`, 30, 80);
+
+  // Lives Display
+  let heartString = "";
+  for (let i = 0; i < lives; i++) {
+    heartString += "❤️ ";
+  }
+  text(`LIVES: ${heartString}`, 30, 80);
 
   // Drawing Card Box
   rectMode(CENTER);
@@ -129,7 +121,7 @@ function drawPlayScreen() {
   textStyle(BOLD);
   text(currentCardValue, width / 2, height / 2 - 40);
 
-  // Card Name / Suite Label
+  // Card Name Label
   textSize(14);
   textStyle(NORMAL);
   fill(150);
@@ -210,14 +202,13 @@ function drawGameOverScreen() {
 function resetGameSession() {
   score = 0;
   lives = 3;
-  currentCardValue = floor(random(1, 11)); // 1 to 10
+  currentCardValue = floor(random(1, 11)); // Values 1 to 10
   nextCardValue = floor(random(1, 11));
   cardFeedbackText = "Is the next card Higher or Lower?";
   feedbackColor = [255, 255, 255];
 }
 
 function makeGuess(guess) {
-  // Generate a brand new card for comparison
   nextCardValue = floor(random(1, 11));
 
   let correct = false;
@@ -229,15 +220,14 @@ function makeGuess(guess) {
 
   if (correct) {
     score++;
-    feedbackColor = [139, 195, 74]; // Green feedback
+    feedbackColor = [139, 195, 74];
     cardFeedbackText = `Correct! It was ${nextCardValue}.`;
   } else {
     lives--;
-    feedbackColor = [244, 67, 54]; // Red feedback
+    feedbackColor = [244, 67, 54];
     cardFeedbackText = `Wrong! It was ${nextCardValue}.`;
   }
 
-  // Update current card and check state transitions
   currentCardValue = nextCardValue;
 
   if (score >= targetScore) {
@@ -247,12 +237,11 @@ function makeGuess(guess) {
   }
 }
 
-// Simulated JSON configurations loader
 function loadLevel(levelNum) {
   currentLevel = levelNum;
   resetGameSession();
 
-  // Dynamically scale parameters mimicking standard JSON loader behavior
+  // Scales parameters mimicking dynamic JSON thresholds
   if (levelNum === 1) {
     targetScore = 3;
   } else if (levelNum === 2) {
@@ -261,9 +250,7 @@ function loadLevel(levelNum) {
     targetScore = 8;
   }
 
-  console.log(
-    `Level ${levelNum} Loaded. Target Score to reach: ${targetScore}`,
-  );
+  console.log(`Level ${levelNum} Loaded. Target Score: ${targetScore}`);
 }
 
 // ============================================================
@@ -272,7 +259,7 @@ function loadLevel(levelNum) {
 
 function mousePressed() {
   if (gameState === STATE_START) {
-    // Click Play Game button
+    // Check main play button bounds
     if (
       mouseX > width / 2 - 100 &&
       mouseX < width / 2 + 100 &&
@@ -304,17 +291,13 @@ function mousePressed() {
   }
 }
 
-// ------------------------------------------------------------
-// keyPressed()
-// Handles debug keyboard shortcuts & state jumps
-// ------------------------------------------------------------
 function keyPressed() {
-  // 1. Toggle Debug Panel Visibility
+  // 1. Toggle Debug Panel Visibility (D Key)
   if (key === "d" || key === "D") {
     showDebug = !showDebug;
   }
 
-  // 2. State-Jump Shortcuts (Always active for testing)
+  // 2. State-Jump Shortcuts (S, W, O Keys)
   if (key === "s" || key === "S") {
     gameState = STATE_START;
   }
@@ -325,7 +308,7 @@ function keyPressed() {
     gameState = STATE_OVER;
   }
 
-  // 3. Level-Jump Shortcuts (Loads json levels and forces game into play state)
+  // 3. Level-Jump Shortcuts (1, 2, 3 Keys)
   if (key === "1") {
     loadLevel(1);
     gameState = STATE_PLAY;
@@ -341,52 +324,52 @@ function keyPressed() {
 }
 
 // ============================================================
-// DRAW DEBUG HELPER
+// DRAW DEBUG PANEL - very beaut pink
 // ============================================================
 function drawDebugPanel() {
   push();
 
-  // Outer semi-transparent background panel
-  fill(18, 18, 28, 230);
-  stroke(244, 67, 54); // Accent Red Border
+  // Semi-transparent deep-plum/pink background overlay
+  fill(30, 20, 28, 240);
+  stroke(255, 105, 180); // Vibrant Hot Pink Border
   strokeWeight(2);
   rectMode(CORNER);
   rect(15, 15, 270, 235, 8);
 
-  // Header
+  // Panel Title
   noStroke();
-  fill(244, 67, 54);
+  fill(255, 105, 180); // Hot Pink Title
   textSize(13);
   textStyle(BOLD);
   textAlign(LEFT, TOP);
-  text("⚙️ SYSTEM DEBUG PANEL", 25, 25);
+  text("🌸 SYSTEM DEBUG ACTIVE", 25, 25);
 
-  // Thin dividing line
-  stroke(60);
+  // Soft pink-tinted dividing line
+  stroke(80, 40, 60);
   strokeWeight(1);
   line(20, 45, 280, 45);
   noStroke();
 
-  // Active game diagnostics
-  fill(200);
+  // Diagnostics Info
+  fill(240, 220, 230); // Soft lavender-pink text
   textSize(11);
   textStyle(NORMAL);
   text(`State: ${gameState.toUpperCase()}`, 25, 55);
   text(`Current Level: ${currentLevel}`, 25, 70);
-  text(`Score: ${score} / Target: ${targetScore}`, 25, 85);
+  text(`Score: ${score} / ${targetScore}`, 25, 85);
   text(`Lives: ${lives}`, 25, 100);
 
-  // Thin dividing line
-  stroke(60);
+  // Soft pink-tinted dividing line
+  stroke(80, 40, 60);
   strokeWeight(1);
   line(20, 115, 280, 115);
   noStroke();
 
-  // Keyboard map legend
-  fill(255, 193, 7); // Warning/Yellow color
+  // Keyboard binds directory
+  fill(255, 182, 193); // Light Pastel Pink
   text("DEBUG CONTROL BINDS:", 25, 125);
 
-  fill(160);
+  fill(190, 170, 180);
   text("[D] Toggle This Panel", 25, 145);
   text("[1, 2, 3] Jump directly to Level", 25, 160);
   text("[S] Force Start Screen", 25, 175);
