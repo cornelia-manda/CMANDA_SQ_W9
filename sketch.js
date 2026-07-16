@@ -359,7 +359,7 @@ function drawDebugPanel() {
   text(`Score: ${score} / ${targetScore}`, 25, 85);
   text(`Lives: ${lives}`, 25, 100);
 
-  // Soft pink-tinted dividing line
+  // Soft pink-tinted dividing linee
   stroke(80, 40, 60);
   strokeWeight(1);
   line(20, 115, 280, 115);
